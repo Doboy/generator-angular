@@ -32,6 +32,13 @@ var Generator = module.exports = function Generator() {
     this.env.options.testPath = this.env.options.testPath || 'test/spec';
   }
 
+  if (typeof this.env.options.scriptPaths === 'undefined') {
+    try {
+      this.env.options.scriptPaths = require(path.join(process.cwd(), 'bower.json')).scriptPath;
+    } catch (e) {}
+    this.env.options.scriptPaths = this.env.options.scriptPaths || 'scripts';
+  }
+
   this.env.options.coffee = this.options.coffee;
   if (typeof this.env.options.coffee === 'undefined') {
     this.option('coffee');
@@ -106,7 +113,7 @@ Generator.prototype.addScriptToIndex = function (script) {
 };
 
 Generator.prototype.generateSourceAndTest = function (appTemplate, testTemplate, targetDirectory, skipAdd) {
-  this.appTemplate(appTemplate, path.join('scripts', targetDirectory, this.name));
+  this.appTemplate(appTemplate, path.join(this.env.options.scriptPaths, targetDirectory, this.name));
   this.testTemplate(testTemplate, path.join(targetDirectory, this.name));
   if (!skipAdd) {
     this.addScriptToIndex(path.join(targetDirectory, this.name));
